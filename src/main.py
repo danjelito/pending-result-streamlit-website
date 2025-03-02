@@ -6,22 +6,23 @@ import time
 st.title("Pending Result Processor v1.0")
 st.write("**Automatically generate pending result reports.**")
 st.write("Created by Devan, 2 March 2025.")
-st.write("---")
-st.write("**Instructions:**")
-instructions = [
-    "1. Go to [world.wallstreetenglish.com](https://world.wallstreetenglish.com)",
-    "2. Login with `62.jak05.pk` account",
-    "3. Go to `Menu -> Reports`",
-    "4. Select `Pending Result`",
-    "5. Select `Class Type = Class Room Activities`",
-    "6. Click `Excel File` to download the report",
-    "7. Select `Class Type = Others`",
-    "8. Click `Excel File` again to download the report",
-    "9. Repeat steps 3-8 with account `62.ino01.aa`",
-    "10. Upload the downloaded files here"
-]
-for instruction in instructions:
-    st.write(instruction)
+
+with st.sidebar:
+    st.write("**Instructions:**")
+    instructions = [
+        "1. Go to [world.wallstreetenglish.com](https://world.wallstreetenglish.com)",
+        "2. Login with `62.jak05.pk` account",
+        "3. Go to `Menu -> Reports`",
+        "4. Select `Pending Result`",
+        "5. Select `Class Type = Class Room Activities`",
+        "6. Click `Excel File` to download the report",
+        "7. Select `Class Type = Others`",
+        "8. Click `Excel File` again to download the report",
+        "9. Repeat steps 3-8 with account `62.ino01.aa`",
+        "10. Upload the downloaded files here"
+    ]
+    for instruction in instructions:
+        st.write(instruction)
 
 
 st.write("---")
