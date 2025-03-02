@@ -1,2 +1,5 @@
-streamlit
+numpy
+openpyxl
 pandas
+streamlit
+xlrd
