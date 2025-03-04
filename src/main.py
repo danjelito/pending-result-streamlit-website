@@ -3,7 +3,7 @@ import pandas as pd
 from processor import generate_report, load_files, create_download_link
 import time
 
-st.title("Pending Result Processor v1.0")
+st.title("Pending Result Processor v1.1")
 st.write("**Automatically generate pending result reports.**")
 st.write("Created by Devan, 2 March 2025.")
 

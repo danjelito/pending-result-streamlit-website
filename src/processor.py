@@ -18,7 +18,10 @@ def create_download_link(data):
     buffer = io.BytesIO()
     with pd.ExcelWriter(buffer, engine="xlsxwriter") as writer:
         for sheet_name, df in data.items():
-            df.to_excel(writer, sheet_name=sheet_name, index=False)
+            if sheet_name == "Summary":
+                df.to_excel(writer, sheet_name=sheet_name, index=True)
+            else:
+                df.to_excel(writer, sheet_name=sheet_name, index=False)
         writer.close()
 
     buffer.seek(0)  # Reset buffer position
@@ -63,6 +66,9 @@ def generate_report(df: pd.DataFrame) -> dict:
         )
         .assign(
             time=lambda df_: pd.to_datetime(df_["date"], errors="coerce").dt.time,
+            month_=lambda df_: pd.to_datetime(df_["date"], errors="coerce").dt.strftime(
+                "%Y-%m"
+            ),
             date=lambda df_: pd.to_datetime(df_["date"], errors="coerce").dt.strftime(
                 "%d %b %Y"
             ),
@@ -89,18 +95,35 @@ def generate_report(df: pd.DataFrame) -> dict:
                 "class_type",
                 "date",
                 "time",
+                "month_",
             ],
         ]
-        .rename(columns=lambda c: c.replace("_", " ").title())
+        .rename(columns=lambda c: c.replace("_", " ").title().strip())
     )
 
+    # Dictionary to store results
     result = {}
 
-    for area in ["JKT 1", "JKT 2", "JKT 3", "BDG", "SBY", "CIK"]:
-        df_area_result = df_clean.loc[df_clean["Area"] == area].reset_index(drop=True)
-        result[area] = df_area_result
+    # Create summary DF
+    df_summary = (df_clean
+        .groupby(["Area", "Teacher Clean", "Month"])
+        .agg(count=("Teacher Clean", "count"))
+        .reset_index()
+        .rename(columns={"Teacher Clean": "Teacher", "Month": "Month", "count": "Count"})
+        .sort_values(["Area", "Teacher", "Month"], ascending=[True, True, False])
+        .pivot(index=["Area", "Teacher"], columns="Month", values="Count")
+        .fillna(0)
+        .astype(int)
+    )
+    df_summary = df_summary[df_summary.columns[::-1]]  # Reverse the column order
+    result["Summary"] = df_summary 
 
+    # Create DF per area
+    for area in ["JKT 1", "JKT 2", "JKT 3", "BDG", "SBY", "CIK"]:
+        df_area_result = df_clean.loc[df_clean["Area"] == area].reset_index(drop=True).drop(columns="Month")
+        result[area] = df_area_result
     result["Unmapped"] = df_clean.loc[df_clean["Area"].isnull()]
+    # Create raw data
     result["Raw Data"] = df_clean
 
     return result
